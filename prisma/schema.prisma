@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("ADMIN_USER_SERVICE_DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  firstname String
+  lastname  String
+  phone     String?
+  password  String
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  status    UserStatus @default(ACTIVE)
+  role      UserRole @default(EMPLOYEE)
+  sessions  Session[]
+}
+
+model Session {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                String   @db.ObjectId
+  accessToken           String
+  accessTokenExpiration DateTime
+  refreshToken          String
+  refreshTokenExpiration DateTime
+  deviceInfo            String?
+  ipAddress             String?
+  isActive              Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId], name: "userSession")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  EMPLOYEE
+  SUPPORT
+}
