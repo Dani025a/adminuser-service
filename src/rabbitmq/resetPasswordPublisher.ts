@@ -7,7 +7,9 @@ export const publishResetPasswordMessage = async (email: string, resetToken: str
   const queue = 'Reset_Password';
   await channel.assertQueue(queue, { durable: true });
 
-  const message = JSON.stringify({ email, resetToken });
+  const user = "admin"
+
+  const message = JSON.stringify({ email, resetToken, user });
   channel.sendToQueue(queue, Buffer.from(message));
 
   console.log(`Published message to Reset_Password: ${message}`);
